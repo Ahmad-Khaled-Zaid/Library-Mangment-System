@@ -12,7 +12,6 @@ private:
 	int publishYear;
 public:
 	void create_Book();
-	void show_info();
 };
 
 class Student {
@@ -21,14 +20,31 @@ private:
 	char studentID[10];
 
 public:
+	void add_student();
+	void show_info();
+
 
 };
+//************************************************
+//        ORDINARY FUNCTIONS PROTOTYPES
+//************************************************
+void register_student();
+void gotoxy(int x, int y);
+void intro();
+void admin_Control_Panel();
+void admin_Menu();
 
-//global objects and variables
+//************************************************
+//       GLOBAL VARIABLES AND OBJECTS
+//************************************************
 std::ifstream readObject;
 std::ofstream writeObject;
 Student student;
 Book book;
+
+//************************************************
+//       MEMEBERS FUNCTIONS DEFINITIONS
+//************************************************
 
 void Book::create_Book() {
 	std::cout << "PLEASE ENTER THE BOOK NAME : ";
@@ -38,14 +54,15 @@ void Book::create_Book() {
 	std::cout << "ENTER THE PUBLISH YEAR: ";
 	std::cin >> publishYear;
 }
-void gotoxy(int x, int y)
-{
-	static HANDLE h = NULL;
-	if (!h)
-		h = GetStdHandle(STD_OUTPUT_HANDLE);
-	COORD c = { x, y };
-	SetConsoleCursorPosition(h, c);
+
+void Student::add_student() {
+	std::cout << "Enter Student Name : ";
+	std::cin >> studentName;
+	std::cout << "Enter Student ID : ";
+	std::cin >> studentID;
 }
+
+
 
 void intro()
 {
@@ -64,14 +81,18 @@ void write_book() {
 	writeObject.write((char*)&book, sizeof(Book));
 	writeObject.close();
 }
-void Book::show_info() {
-	readObject.open("Books.dat", std::ios::in);
-	while (readObject.read((char*)&book, sizeof(Book))) {
-		std::cout << bookName << " " << author << " " << publishYear;
+void Student::show_info() {
+	readObject.open("Students.dat", std::ios::in);
+	while (readObject.read((char*)&student, sizeof(Student))) {
+		std::cout << studentName << std::endl;
+		std::cout << studentID << std::endl;
+
 	}
 	readObject.close();
 
 }
+
+
 int main() {
 	char option;
 	intro();
@@ -91,14 +112,12 @@ int main() {
 		system("cls");
 		switch (option) {
 		case'1':
-			write_book();
 			break;
 		case'2':
-			book.show_info();
-			std::cin.get();
-			std::cin.ignore();
+			student.show_info();
 			break;
 		case'3':
+			admin_Control_Panel();
 			break;
 		case'4':
 			return 0;
@@ -107,6 +126,103 @@ int main() {
 		default:
 			std::cout << "PLEASE CHOOSE NUMBERS FROM THE MENU" << std::endl;
 		}
+		std::cin.get();
+		std::cin.ignore();
 	} while (option != '4');
 
+}
+
+//************************************************
+//        FUNCTION TO CREATE NEW STUDENETS
+//************************************************
+
+void register_student() {
+	writeObject.open("Students.dat", std::ios::app | std::ios::out);
+	student.add_student();
+	writeObject.write((char*)&student, sizeof(Student));
+	writeObject.close();
+}
+
+
+//************************************************
+//       FUNCTION FOR ADMIN OPERATIONS
+//************************************************
+
+void admin_Control_Panel() {
+	char option = '1';
+	do {
+		admin_Menu();
+		option = _getche();
+		option = toupper(option);
+		switch (option) {
+		case 'A':
+			write_book();
+			break;
+		case 'B':
+			break;
+
+		case 'C':
+			break;
+
+		case 'D':
+			break;
+
+		case 'E':
+			break;
+
+		case 'F':
+			break;
+
+		case 'G':
+			break;
+
+		case 'H':
+			break;
+		case 'I':
+			break;
+		case 'J':
+			break;
+		case 'K':
+			std::cout << "YOU ARE LEAVING THE ADMIN CONTROL PANNEL IN 5 SECONDS, PLEASE WAIT...";
+			Sleep(3000);
+			break;
+		default:
+			std::cout << "Wrong Input,Please Enter Your choice <A - K>";
+			break;
+		}
+	} while (option != 'K');
+
+}
+//************************************************
+//      FUNCTION FOR PRENETING THE ADMIN PAGE
+//************************************************
+
+void admin_Menu() {
+	system("CLS");
+	std::cout << "\n\n\n\tADMINISTRATOR MENU";
+	std::cout << "\n\n\tA.CREATE STUDENT RECORD";
+	std::cout << "\n\n\tB.DISPLAY ALL STUDENTS RECORD";
+	std::cout << "\n\n\tC.DISPLAY SPECIFIC STUDENT RECORD ";
+	std::cout << "\n\n\tD.MODIFY STUDENT RECORD";
+	std::cout << "\n\n\tE.DELETE STUDENT RECORD";
+	std::cout << "\n\n\tF.CREATE BOOK ";
+	std::cout << "\n\n\tG.DISPLAY ALL BOOKS ";
+	std::cout << "\n\n\tH.DISPLAY SPECIFIC BOOK ";
+	std::cout << "\n\n\tI.MODIFY BOOK ";
+	std::cout << "\n\n\tJ.DELETE BOOK ";
+	std::cout << "\n\n\tK.BACK TO MAIN MENU";
+	std::cout << "\n\n\tPlease Enter Your Choice <A-K> ";
+}
+
+//************************************************
+//       FUNCTION FOR CONTROLLING THE CURSOR
+//************************************************
+
+void gotoxy(int x, int y)
+{
+	static HANDLE h = NULL;
+	if (!h)
+		h = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD c = { x, y };
+	SetConsoleCursorPosition(h, c);
 }
