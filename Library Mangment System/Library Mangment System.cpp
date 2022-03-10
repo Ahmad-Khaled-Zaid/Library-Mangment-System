@@ -21,7 +21,9 @@ private:
 
 public:
 	void add_student();
-	void show_info();
+	//void show_info();
+	void report();
+	char* retID();
 
 
 };
@@ -33,7 +35,8 @@ void gotoxy(int x, int y);
 void intro();
 void admin_Control_Panel();
 void admin_Menu();
-
+void display();
+void display_Special_Student(char StudentID[20]);
 //************************************************
 //       GLOBAL VARIABLES AND OBJECTS
 //************************************************
@@ -62,7 +65,10 @@ void Student::add_student() {
 	std::cin >> studentID;
 }
 
-
+void Student::report() {
+	std::cout << "Student ID : " << studentID << std::endl;
+	std::cout << "Student Name : " << studentName << std::endl;
+}
 
 void intro()
 {
@@ -81,16 +87,16 @@ void write_book() {
 	writeObject.write((char*)&book, sizeof(Book));
 	writeObject.close();
 }
-void Student::show_info() {
-	readObject.open("Students.dat", std::ios::in);
-	while (readObject.read((char*)&student, sizeof(Student))) {
-		std::cout << studentName << std::endl;
-		std::cout << studentID << std::endl;
-
-	}
-	readObject.close();
-
-}
+//void Student::show_info() {
+//	readObject.open("Students.dat", std::ios::in);
+//	while (readObject.read((char*)&student, sizeof(Student))) {
+//		std::cout << studentName << std::endl;
+//		std::cout << studentID << std::endl;
+//
+//	}
+//	readObject.close();
+//
+//}
 
 
 int main() {
@@ -114,7 +120,6 @@ int main() {
 		case'1':
 			break;
 		case'2':
-			student.show_info();
 			break;
 		case'3':
 			admin_Control_Panel();
@@ -126,8 +131,8 @@ int main() {
 		default:
 			std::cout << "PLEASE CHOOSE NUMBERS FROM THE MENU" << std::endl;
 		}
-		std::cin.get();
-		std::cin.ignore();
+		/*std::cin.get();
+		std::cin.ignore();*/
 	} while (option != '4');
 
 }
@@ -137,6 +142,7 @@ int main() {
 //************************************************
 
 void register_student() {
+	system("cls");
 	writeObject.open("Students.dat", std::ios::app | std::ios::out);
 	student.add_student();
 	writeObject.write((char*)&student, sizeof(Student));
@@ -149,6 +155,7 @@ void register_student() {
 //************************************************
 
 void admin_Control_Panel() {
+	char studentNumber[10] = {};
 	char option = '1';
 	do {
 		admin_Menu();
@@ -156,12 +163,17 @@ void admin_Control_Panel() {
 		option = toupper(option);
 		switch (option) {
 		case 'A':
-			write_book();
+			register_student();
 			break;
 		case 'B':
+			display();
 			break;
 
 		case 'C':
+			system("cls");
+			std::cout << "\nEnter Student ID : ";
+			std::cin >> studentNumber;
+			display_Special_Student(studentNumber);
 			break;
 
 		case 'D':
@@ -183,13 +195,14 @@ void admin_Control_Panel() {
 		case 'J':
 			break;
 		case 'K':
-			std::cout << "YOU ARE LEAVING THE ADMIN CONTROL PANNEL IN 5 SECONDS, PLEASE WAIT...";
+			std::cout << "\nYOU ARE LEAVING THE ADMIN CONTROL PANNEL IN 5 SECONDS, PLEASE WAIT...";
 			Sleep(3000);
 			break;
 		default:
-			std::cout << "Wrong Input,Please Enter Your choice <A - K>";
+			std::cout << "\nWrong Input,Please Enter Your choice <A - K>";
 			break;
 		}
+		_getch();
 	} while (option != 'K');
 
 }
@@ -198,7 +211,7 @@ void admin_Control_Panel() {
 //************************************************
 
 void admin_Menu() {
-	system("CLS");
+	system("cls");
 	std::cout << "\n\n\n\tADMINISTRATOR MENU";
 	std::cout << "\n\n\tA.CREATE STUDENT RECORD";
 	std::cout << "\n\n\tB.DISPLAY ALL STUDENTS RECORD";
@@ -225,4 +238,52 @@ void gotoxy(int x, int y)
 		h = GetStdHandle(STD_OUTPUT_HANDLE);
 	COORD c = { x, y };
 	SetConsoleCursorPosition(h, c);
+}
+
+//************************************************
+//       FUNCTION FOR DISPLAYING STUDENTS
+//************************************************
+void display() {
+	system("cls");
+	readObject.open("Students.dat", std::ios::in);
+	if (!readObject) {
+		std::cout << "File couldn't open\n";
+	}
+	else {
+		while (readObject.read((char*)&student, sizeof(Student)))
+		{
+			student.report();
+		}
+	}
+	readObject.close();
+}
+
+//************************************************
+//    FUNCTION FOR DISPLAYING SPECFIC STUDENT
+//************************************************
+void display_Special_Student(char StudentID[20]) {
+	system("cls");
+	bool flag = false;
+	readObject.open("Students.dat", std::ios::in);
+	if (!readObject) {
+		std::cout << "File couldn't open\n";
+	}
+	while (readObject.read((char*)&student, sizeof(Student)))
+	{
+		if (_strcmpi(student.retID(), StudentID) == 0) {
+			student.report();
+			flag = true;
+			break;
+		}
+
+	}
+	if (flag == false) {
+		std::cout << "Student is not found!" << std::endl;
+	}
+	readObject.close();
+
+}
+
+char* Student::retID() {
+	return studentID;
 }
